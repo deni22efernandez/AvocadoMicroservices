@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FrontEnd", "FrontEnd", "{E6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avocado.Web", "Avocado.Web\Avocado.Web.csproj", "{D79B6AF0-772F-478E-B85B-A8AFA28D1379}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{E0E121FE-0118-4212-93C6-CC7FEBEF9631}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avocado.Services.ProductAPI", "Avocado.Services.ProductAPI\Avocado.Services.ProductAPI.csproj", "{CEC22085-EF49-45CC-A530-4D570D837888}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,12 +21,17 @@ Global
 		{D79B6AF0-772F-478E-B85B-A8AFA28D1379}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D79B6AF0-772F-478E-B85B-A8AFA28D1379}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D79B6AF0-772F-478E-B85B-A8AFA28D1379}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEC22085-EF49-45CC-A530-4D570D837888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEC22085-EF49-45CC-A530-4D570D837888}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEC22085-EF49-45CC-A530-4D570D837888}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEC22085-EF49-45CC-A530-4D570D837888}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D79B6AF0-772F-478E-B85B-A8AFA28D1379} = {E6C1FC54-7253-41C0-A0BB-FE9E21F24D10}
+		{CEC22085-EF49-45CC-A530-4D570D837888} = {E0E121FE-0118-4212-93C6-CC7FEBEF9631}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {82B5647C-FBBD-4B95-BD95-5B5A2941FA98}

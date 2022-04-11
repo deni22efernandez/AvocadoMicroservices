@@ -7,9 +7,10 @@ namespace Avocado.Web
 {
 	public class Common
 	{
+		public const string ProductBaseUri = "";
 		public enum RequestType
 		{
-			GET,POST,PUT,REMOVE
+			GET,POST,PUT,DELETE
 		}
 	}
 }

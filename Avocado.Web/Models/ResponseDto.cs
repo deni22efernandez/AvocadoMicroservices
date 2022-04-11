@@ -9,6 +9,6 @@ namespace Avocado.Web.Models
 	{
 		public bool IsSuccess { get; set; } = true;
 		public object ResponseObject { get; set; }
-		public List<string> ErrorMessages { get; set; } = new List<string>();
+		public List<string> ErrorMessages { get; set; }
 	}
 }

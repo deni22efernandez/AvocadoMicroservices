@@ -14,5 +14,6 @@ namespace Avocado.Services.ProductAPI.DbContexts
 
 		}
 		public DbSet<Product> Products { get; set; }
+		
 	}
 }

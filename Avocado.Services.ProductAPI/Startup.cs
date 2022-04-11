@@ -1,4 +1,6 @@
 using Avocado.Services.ProductAPI.DbContexts;
+using Avocado.Services.ProductAPI.Repository;
+using Avocado.Services.ProductAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,6 +34,7 @@ namespace Avocado.Services.ProductAPI
 			{
 				x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 			});
+			services.AddScoped<IProductRepository, ProductRepository>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

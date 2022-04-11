@@ -35,6 +35,13 @@ namespace Avocado.Services.ProductAPI
 				x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 			});
 			services.AddScoped<IProductRepository, ProductRepository>();
+			services.AddSwaggerGen(x=> {
+				x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+				{
+					Title = "Avocado.Services.ProductAPI",
+					Version = "v1"
+				});
+			});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +50,11 @@ namespace Avocado.Services.ProductAPI
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
+				app.UseSwagger();
+				app.UseSwaggerUI(x =>
+				{
+					x.SwaggerEndpoint("/swagger/v1/swagger.json", "Avocado.Services.ProductAPI v1");
+				});
 			}
 
 			app.UseHttpsRedirection();

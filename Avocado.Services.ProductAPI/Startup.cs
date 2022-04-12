@@ -34,7 +34,8 @@ namespace Avocado.Services.ProductAPI
 			{
 				x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
 			});
-			services.AddScoped<IProductRepository, Product_Repository>();
+			services.AddScoped<IProductRepository, Product_sp_Repository>();
+			//services.AddScoped<IProductRepository, Product_Repository>();
 			//services.AddScoped<IProductRepository, ProductRepository>();
 			services.AddSwaggerGen(x=> {
 				x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo

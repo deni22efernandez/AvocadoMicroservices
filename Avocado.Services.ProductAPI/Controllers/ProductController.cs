@@ -13,11 +13,13 @@ namespace Avocado.Services.ProductAPI.Controllers
 	[ApiController]
 	public class ProductController : ControllerBase
 	{
-		private readonly IProductRepository _productRepo;
+		//private readonly IProductRepository _productRepo;
+		private readonly IProductRepository _spProductRepo;
 		protected ResponseDto responseDto;
-		public ProductController(IProductRepository productRepo)
+		public ProductController(/*IProductRepository productRepo, */IProductRepository spProductRepo)
 		{
-			_productRepo = productRepo;
+			//_productRepo = productRepo;
+			_spProductRepo = spProductRepo;
 			responseDto = new ResponseDto();
 		}
 		[HttpGet("{productId:int}")]
@@ -25,7 +27,8 @@ namespace Avocado.Services.ProductAPI.Controllers
 		{
 			try
 			{
-				var result = await _productRepo.Get(productId);
+				//var result = await _productRepo.Get(productId);
+				var result = await _spProductRepo.Get(productId);
 				responseDto.ResponseObject = result;
 			}
 			catch (Exception e)
@@ -41,7 +44,8 @@ namespace Avocado.Services.ProductAPI.Controllers
 		{
 			try
 			{
-				var result = await _productRepo.Get();
+				//var result = await _productRepo.Get();
+				var result = await _spProductRepo.Get();
 				responseDto.ResponseObject = result;
 			}
 			catch (Exception e)
@@ -56,7 +60,8 @@ namespace Avocado.Services.ProductAPI.Controllers
 		{
 			try
 			{
-				await _productRepo.Create(productDto);
+				//await _productRepo.Create(productDto);
+				await _spProductRepo.Create(productDto);
 			}
 			catch(Exception e)
 			{
@@ -70,7 +75,8 @@ namespace Avocado.Services.ProductAPI.Controllers
 		{
 			try
 			{
-				await _productRepo.Update(productDto);
+				//await _productRepo.Update(productDto);
+				await _spProductRepo.Update(productDto);
 			}
 			catch(Exception e)
 			{
@@ -82,8 +88,9 @@ namespace Avocado.Services.ProductAPI.Controllers
 
 		[HttpDelete("{productId:int}")]
 		public async Task<object> Delete(int productId)
-		{			
-			if (!await _productRepo.Delete(productId))
+		{	
+			if(!await _spProductRepo.Delete(productId))
+			//if (!await _productRepo.Delete(productId))
 			{
 				responseDto.IsSuccess = false;
 				responseDto.ErrorMessages = new List<string>() { "Error while deleting" };

@@ -30,11 +30,11 @@ namespace Avocado.Services.ProductAPI
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllers();
-			services.AddDbContext<ApplicationDbContext>(x =>
-			{
-				x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-			});
-			services.AddScoped<IProductRepository, ProductRepository>();
+			//services.AddDbContext<ApplicationDbContext>(x =>
+			//{
+			//	x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+			//});
+			services.AddScoped<IProductRepository, Product_Repository>();
 			services.AddSwaggerGen(x=> {
 				x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
 				{

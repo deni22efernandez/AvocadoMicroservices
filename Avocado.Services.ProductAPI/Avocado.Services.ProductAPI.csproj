@@ -6,6 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20220412131709_SP.cs" />
+    <Compile Remove="Migrations\20220412131709_SP.Designer.cs" />
+    <Compile Remove="Migrations\20220412140943_sp.cs" />
+    <Compile Remove="Migrations\20220412140943_sp.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.0">
       <PrivateAssets>all</PrivateAssets>

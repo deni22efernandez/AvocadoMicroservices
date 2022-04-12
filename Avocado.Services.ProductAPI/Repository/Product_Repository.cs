@@ -24,94 +24,94 @@ namespace Avocado.Services.ProductAPI.Repository
 		{
 			await using var _connection = new SqlConnection(_connectionString);
 
-			string query = @"Insert into Products (Name, Price, ImageUrl, CategoryName, Description) values
-												(@name, @price, @image, @category, @description)";
-			var result = await _connection.QueryAsync<int>(query, new
+			string query = @"Insert into Products values (@name, @price, @image, @category, @description)";
+			return _connection.ExecuteAsync(query, new
 			{
 				@name = productDto.Name,
 				@price = productDto.Price,
 				@image = productDto.ImageUrl,
 				@category = productDto.CategoryName,
 				@description = productDto.Description
-			});
+			}).GetAwaiter().GetResult() > 0;
 
-			return result.Count() > 0;
 		}
 
 		public async Task<bool> Delete(int productId)
 		{
 			await using var _connection = new SqlConnection(_connectionString);
-			string query = "Delete from Products where Id == @productId";
-			var result = await _connection.QueryAsync<int>(query, new { @productId = productId });
-			return result.Count() > 0;
+			string query = "Delete from Products where Id = @productId";
+			var result= _connection.ExecuteAsync(query, new { @productId = productId }).GetAwaiter().GetResult() > 0;
+			return result;
 		}
 
 		public async Task<ProductDto> Get(int productId)
 		{
 			await using var _connection = new SqlConnection(_connectionString);
-			string query = "Select * from Products where Id == @productId";
-			var result = await _connection.QueryAsync<Product>(query, new { @productId = productId });
-			if (result.Any())
-			{
-				ProductDto dto = JsonConvert.DeserializeObject<ProductDto>(Convert.ToString(result));
-				return dto;
-			}
-			return null;
+			string query = "Select * from Products where Id = @productId";
+			var result = _connection.QueryAsync<Product>(query, new { @productId = productId }).GetAwaiter().GetResult().Single();
+
+			ProductDto dto = JsonConvert.DeserializeObject<ProductDto>(JsonConvert.SerializeObject(result));
+			//var json = JsonConvert.SerializeObject(result);
+			//ProductDto dto = JsonConvert.DeserializeObject<ProductDto>(json);
+			//ProductDto dto = new ProductDto()
+			//{
+			//	Id = result.Id,
+			//	Name = result.Name,
+			//	CategoryName = result.CategoryName,
+			//	Description = result.Description,
+			//	ImageUrl = result.ImageUrl,
+			//	Price = result.Price
+			//};
+			return dto;
+
 		}
 
 		public async Task<IEnumerable<ProductDto>> Get()
 		{
 			await using var _connection = new SqlConnection(_connectionString);
 			string query = "Select * from Products";
-			var result = await _connection.QueryAsync<IEnumerable<Product>>(query);
-			if (result.Count() > 0)
+			var result = await _connection.QueryAsync<Product>(query);			
+			List<ProductDto> productDtos = new List<ProductDto>();
+			foreach (var item in result)
 			{
-				List<ProductDto> productDtos = new List<ProductDto>();
-				foreach (var item in result)
-				{
-					productDtos.Add(JsonConvert.DeserializeObject<ProductDto>(Convert.ToString(item)));
-				}
-				return productDtos;
+				productDtos.Add(JsonConvert.DeserializeObject<ProductDto>(JsonConvert.SerializeObject(item)));
 			}
-			return null;
+			return productDtos;
 		}
 
 		public async Task<bool> Update(ProductDto productDto)
 		{
 			await using var _connection = new SqlConnection(_connectionString);
-			string query1 = @"Update Products
-							set Name=@name, Price=@price, ImageUrl=@image, CategoryName=@category, Description=@description
-							where Id==@productId";
-			string query2 = @"Update Products
-							set Name=@name, Price=@price, CategoryName=@category, Description=@description
-							where Id==@productId";
-
-			IEnumerable<int> result = new List<int>();
-
 			if (productDto.ImageUrl == null)
 			{
-				result = await _connection.QueryAsync<int>(query2, new
+				string query2 = @"Update Products
+							set Name=@name, Price=@price, CategoryName=@category, Description=@description
+							where Id=@productId";
+				return await _connection.ExecuteAsync(query2, new
 				{
 					@name = productDto.Name,
 					@price = productDto.Price,
 					@category = productDto.CategoryName,
 					@description = productDto.Description,
 					@productId = productDto.Id
-				});
+				})>0;
 			}
 			else
 			{
-				result = await _connection.QueryAsync<int>(query1, new
+				string query1 = @"Update Products
+							set Name=@name, Price=@price, ImageUrl=@image, CategoryName=@category, Description=@description
+							where Id=@productId";
+				return await _connection.ExecuteAsync(query1, new
 				{
 					@name = productDto.Name,
 					@price = productDto.Price,
-					@image=productDto.ImageUrl,
+					@image = productDto.ImageUrl,
 					@category = productDto.CategoryName,
 					@description = productDto.Description,
 					@productId = productDto.Id
-				});
+				})>0;
 			}
-			return result.Count() > 0;
+			
 		}
 	}
 }

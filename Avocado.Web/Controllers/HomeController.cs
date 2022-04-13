@@ -1,6 +1,8 @@
 ﻿using Avocado.Web.Models;
+using Avocado.Web.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,16 +13,22 @@ namespace Avocado.Web.Controllers
 {
 	public class HomeController : Controller
 	{
-		private readonly ILogger<HomeController> _logger;
+		private readonly IProductService _productService;
 
-		public HomeController(ILogger<HomeController> logger)
+		public HomeController(IProductService productService)
 		{
-			_logger = logger;
+			_productService = productService;
 		}
 
-		public IActionResult Index()
+		public async Task<IActionResult> Index()
 		{
-			return View();
+			List<ProductDto> productList = new List<ProductDto>();
+			var result = await _productService.GetAllProductsAsync<ResponseDto>(null);
+			if (result!=null && result.IsSuccess)
+			{
+				productList=JsonConvert.DeserializeObject<List<ProductDto>>(Convert.ToString(result.ResponseObject));
+			}
+			return View(productList);
 		}
 
 		public IActionResult Privacy()

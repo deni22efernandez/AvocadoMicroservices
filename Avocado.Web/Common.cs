@@ -7,7 +7,7 @@ namespace Avocado.Web
 {
 	public class Common
 	{
-		public const string ProductBaseUri = "";
+		public const string ProductBaseUri = "https://localhost:44313/api/products";
 		public enum RequestType
 		{
 			GET,POST,PUT,DELETE

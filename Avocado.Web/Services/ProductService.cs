@@ -21,7 +21,7 @@ namespace Avocado.Web.Services
 				Object = productDto,
 				RequestType = Common.RequestType.POST,
 				Token = "",
-				Url = Common.ProductBaseUri + "/api/products"
+				Url = Common.ProductBaseUri
 			});
 		}
 
@@ -31,7 +31,7 @@ namespace Avocado.Web.Services
 			{
 				RequestType = Common.RequestType.DELETE,
 				Token = "",
-				Url = Common.ProductBaseUri + "/api/products/" + productId
+				Url = Common.ProductBaseUri + "/" + productId
 			});
 		}
 
@@ -41,7 +41,7 @@ namespace Avocado.Web.Services
 			{
 				Token = "",
 				RequestType = Common.RequestType.GET,
-				Url = Common.ProductBaseUri + "/api/products"
+				Url = Common.ProductBaseUri 
 			});
 		}
 
@@ -51,7 +51,7 @@ namespace Avocado.Web.Services
 			{
 				Token = "",
 				RequestType = Common.RequestType.GET,
-				Url = Common.ProductBaseUri + "/api/products/" + productId
+				Url = Common.ProductBaseUri + "/" + productId
 			});
 		}
 
@@ -62,7 +62,7 @@ namespace Avocado.Web.Services
 				Object=productDto,
 				Token = "",
 				RequestType = Common.RequestType.PUT,
-				Url = Common.ProductBaseUri + "/api/products"
+				Url = Common.ProductBaseUri
 			});
 		}
 	}

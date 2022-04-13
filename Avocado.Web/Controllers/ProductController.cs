@@ -46,7 +46,7 @@ namespace Avocado.Web.Controllers
 				var result=await _productService.UpdateProductAsync<ResponseDto>(productDto, token: null);
 				if(result!=null && result.IsSuccess)
 				{
-					return RedirectToAction(nameof(Index));
+					return RedirectToAction(nameof(ProductIndex));
 				}
 			}
 			return View(productDto);
@@ -65,7 +65,7 @@ namespace Avocado.Web.Controllers
 				var result = await _productService.CreateProductAsync<ResponseDto>(productDto, token: null);
 				if(result!=null && result.IsSuccess)
 				{
-					return RedirectToAction(nameof(Index));
+					return RedirectToAction(nameof(ProductIndex));
 				}
 			}
 			return View(productDto);
@@ -79,7 +79,7 @@ namespace Avocado.Web.Controllers
 				TempData["error"] = result.ErrorMessages.Single();
 			}
 			TempData["success"] = "Delete successful";
-			return RedirectToAction(nameof(Index));
+			return RedirectToAction(nameof(ProductIndex));
 		}
 	}
 }

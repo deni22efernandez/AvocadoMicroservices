@@ -1,0 +1,43 @@
+﻿@model List<Avocado.Web.Models.ProductDto>
+
+@if (Model.Count() > 0)
+{
+<div>
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-lg-10 py-3">
+			<div class="offset-10">
+				<a asp-action="ProductCreate" class="btn btn-outline-success fom-control">Create</a>
+			</div>
+			<table class="table table-borderless text-center">
+				<tr class="text-success">
+					<th>#</th>
+					<th>Name</th>
+					<th>Price</th>
+					<th>Category</th>
+					<th></th>
+				</tr>
+				@for (int i = 0; i < Model.Count(); i++)
+				{
+					<tr>
+						<td>@Model[i].Id</td>
+						<td>@Model[i].Name</td>
+						<td>$@Model[i].Price</td>
+						<td>@Model[i].CategoryName</td>
+						<td>
+							<a asp-action="ProductEdit" asp-route-id="@Model[i].Id">
+								<button class="btn btn-outline-warning btn-sm" style="display: inline-table">Edit</button>
+							</a>
+							<button asp-action="ProductDelete" class="btn btn-outline-danger btn-sm" style="display: inline-table" disabled>Delete</button>
+						</td>
+					</tr>
+				}
+			</table>			
+		</div>		
+	</div>
+</div>
+}
+else
+{
+	<p>No products to fetch</p>
+}

@@ -51,7 +51,7 @@ namespace Avocado.Web.Controllers
 			}
 			return View(productDto);
 		}
-		public IActionResult Create()
+		public IActionResult ProductCreate()
 		{
 			return View();
 		}

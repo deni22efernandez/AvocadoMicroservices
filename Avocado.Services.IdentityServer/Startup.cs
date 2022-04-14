@@ -1,6 +1,10 @@
+using Avocado.Services.IdentityServer.DbContexts;
+using Avocado.Services.IdentityServer.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +28,23 @@ namespace Avocado.Services.IdentityServer
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllersWithViews();
+			services.AddDbContext<ApplicationDbContext>(x => x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+			services.AddIdentity<ApplicationUser, IdentityRole>()
+				.AddEntityFrameworkStores<ApplicationDbContext>()
+				.AddDefaultTokenProviders();
+			services.AddIdentityServer(options =>
+			{
+				options.Events.RaiseErrorEvents = true;
+				options.Events.RaiseFailureEvents = true;
+				options.Events.RaiseInformationEvents = true;
+				options.Events.RaiseSuccessEvents = true;
+				options.EmitStaticAudienceClaim = true;
+			}).AddInMemoryIdentityResources(Common.resources)
+			.AddInMemoryApiScopes(Common.apiScopes)
+			.AddInMemoryClients(Common.clients)
+			.AddDeveloperSigningCredential()
+			.AddAspNetIdentity<ApplicationUser>();
+			
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,7 +64,7 @@ namespace Avocado.Services.IdentityServer
 			app.UseStaticFiles();
 
 			app.UseRouting();
-
+			app.UseIdentityServer();
 			app.UseAuthorization();
 
 			app.UseEndpoints(endpoints =>

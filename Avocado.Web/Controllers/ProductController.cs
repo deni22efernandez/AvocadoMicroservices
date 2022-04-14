@@ -1,9 +1,11 @@
 ﻿using Avocado.Web.Models;
 using Avocado.Web.Services.IServices;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,9 +14,11 @@ namespace Avocado.Web.Controllers
 	public class ProductController : Controller
 	{
 		private readonly IProductService _productService;
-		public ProductController(IProductService productService)
+		private readonly IWebHostEnvironment _hostEnvironment;
+		public ProductController(IProductService productService, IWebHostEnvironment hostEnvironment)
 		{
 			_productService = productService;
+			_hostEnvironment = hostEnvironment;
 		}
 		public async Task<IActionResult> ProductIndex()
 		{
@@ -22,7 +26,7 @@ namespace Avocado.Web.Controllers
 			var result = await _productService.GetAllProductsAsync<ResponseDto>(null);
 			if(result!=null && result.IsSuccess)
 			{
-				products = JsonConvert.DeserializeObject<List<ProductDto>>(Convert.ToString(result.ResponseObject));
+				products = JsonConvert.DeserializeObject<List<ProductDto>>(JsonConvert.SerializeObject(result.ResponseObject));
 			}
 			return View(products);
 		}
@@ -43,6 +47,38 @@ namespace Avocado.Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
+				var formFiles = HttpContext.Request.Form.Files;
+				if (formFiles.Count() > 0)//si se sube una imagen
+				{
+					string fileName = Guid.NewGuid().ToString();
+					var webPath = _hostEnvironment.WebRootPath;
+					var fileExtension = Path.GetExtension(formFiles[0].FileName);
+					var uploads = webPath + @"\images\";
+
+					string imageFromDb = null;
+					var request = await _productService.GetProductAsync<ResponseDto>(productDto.Id, token: null);
+					if(request!=null && request.IsSuccess)
+					{
+						//busco la imagen en la db para reemplazarla en images folder						
+						var productFromDb = JsonConvert.DeserializeObject<ProductDto>(JsonConvert.SerializeObject(request.ResponseObject));
+						imageFromDb = productFromDb.ImageUrl;
+						if (!String.IsNullOrEmpty(imageFromDb))
+						{
+							if (System.IO.File.Exists(Path.Combine(uploads, imageFromDb)))
+							{
+								System.IO.File.Delete(Path.Combine(uploads, imageFromDb));
+							}
+						}
+						
+					}					
+
+					using (var fileStream = new FileStream(Path.Combine(uploads, fileName + fileExtension), FileMode.Create))
+					{
+						formFiles[0].CopyTo(fileStream);
+					}
+
+					productDto.ImageUrl = fileName + fileExtension;
+				}
 				var result=await _productService.UpdateProductAsync<ResponseDto>(productDto, token: null);
 				if(result!=null && result.IsSuccess)
 				{
@@ -62,6 +98,21 @@ namespace Avocado.Web.Controllers
 		{
 			if (ModelState.IsValid)
 			{
+				var formFiles = HttpContext.Request.Form.Files;
+				if (formFiles.Count() > 0)
+				{
+					string fileName = Guid.NewGuid().ToString();
+					var webPath = _hostEnvironment.WebRootPath;
+					var fileExtension = Path.GetExtension(formFiles[0].FileName);
+					var uploads = webPath + @"\images\";
+
+					using (var fileStream = new FileStream(Path.Combine(uploads, fileName + fileExtension), FileMode.Create))
+					{
+						formFiles[0].CopyTo(fileStream);
+					}
+
+					productDto.ImageUrl = fileName + fileExtension;
+				}
 				var result = await _productService.CreateProductAsync<ResponseDto>(productDto, token: null);
 				if(result!=null && result.IsSuccess)
 				{
@@ -70,7 +121,7 @@ namespace Avocado.Web.Controllers
 			}
 			return View(productDto);
 		}
-		[HttpDelete]
+	
 		public async Task<IActionResult> ProductDelete(int productId)
 		{
 			var result = await _productService.DeleteProductAsync<ResponseDto>(productId, token: null);

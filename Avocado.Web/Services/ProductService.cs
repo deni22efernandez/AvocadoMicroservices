@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 namespace Avocado.Web.Services
 {
 	public class ProductService : BaseService, IProductService
-	{		
-		public ProductService(IHttpClientFactory httpClientFactory):base(httpClientFactory)
+	{
+		private readonly IHttpClientFactory _httpClient;
+		public ProductService(IHttpClientFactory httpClient) : base(httpClient)
 		{
-
+			_httpClient = httpClient;
 		}
 		public async Task<T> CreateProductAsync<T>(ProductDto productDto, string token)
 		{

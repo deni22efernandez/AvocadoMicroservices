@@ -12,10 +12,11 @@ namespace Avocado.Web.Services
 {
 	public class BaseService : IBaseService
 	{
-		private readonly IHttpClientFactory _httpclient;
-		public BaseService(IHttpClientFactory httpclient)
+		private readonly IHttpClientFactory _httpclientFactory;
+	
+		public BaseService(IHttpClientFactory httpclientFactory)
 		{
-			_httpclient = httpclient;
+			_httpclientFactory = httpclientFactory;
 		}
 
 		public void Dispose()
@@ -27,7 +28,7 @@ namespace Avocado.Web.Services
 		{
 			try
 			{
-				using var client = _httpclient.CreateClient("AvocadoWeb");
+				using var client = _httpclientFactory.CreateClient("AvocadoWeb");
 				client.DefaultRequestHeaders.Clear();
 
 				HttpRequestMessage requestMessage = new HttpRequestMessage();
@@ -52,7 +53,7 @@ namespace Avocado.Web.Services
 				requestMessage.RequestUri = new Uri(apiRequest.Url);
 				if (apiRequest.Object != null)
 				{
-					var message = JsonConvert.SerializeObject(apiRequest);
+					var message = JsonConvert.SerializeObject(apiRequest.Object);
 					requestMessage.Content = new StringContent(message, Encoding.UTF8, "application/json");
 				}
 				if (!String.IsNullOrEmpty(apiRequest.Token))
@@ -62,8 +63,8 @@ namespace Avocado.Web.Services
 
 				HttpResponseMessage responseMessage = await client.SendAsync(requestMessage);
 
-				var content = responseMessage.Content.ReadAsStringAsync();
-				var responseDto = JsonConvert.DeserializeObject<T>(Convert.ToString(content));
+				var content = await responseMessage.Content.ReadAsStringAsync();
+				var responseDto = JsonConvert.DeserializeObject<T>(content);
 				return responseDto;
 
 			}

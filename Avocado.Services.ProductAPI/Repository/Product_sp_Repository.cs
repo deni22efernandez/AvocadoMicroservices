@@ -75,11 +75,23 @@ namespace Avocado.Services.ProductAPI.Repository
 			parameters.Add("@id", productDto.Id, System.Data.DbType.Int32);
 			parameters.Add("@name", productDto.Name);
 			parameters.Add("@price", productDto.Price);
-			parameters.Add("@image", productDto.ImageUrl);
+			if (productDto.ImageUrl != null)
+			{
+				parameters.Add("@image", productDto.ImageUrl);
+			}			
 			parameters.Add("@category", productDto.CategoryName);
 			parameters.Add("@description", productDto.Description);
-			return await connection.ExecuteAsync("_spUpdateProduct", parameters, commandType: System.Data.CommandType.StoredProcedure) > 0;
+			if (productDto.ImageUrl != null)
+			{
+				return await connection.ExecuteAsync("_spUpdateProduct", parameters, commandType: System.Data.CommandType.StoredProcedure) > 0;
+			}
+			else
+			{
+				return await connection.ExecuteAsync("_spUpdateProductWithoutImage", parameters, commandType: System.Data.CommandType.StoredProcedure)> 0;
+			}	
 
 		}
+
+		
 	}
 }

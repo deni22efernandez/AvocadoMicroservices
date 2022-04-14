@@ -25,10 +25,12 @@
 						<td>$@Model[i].Price</td>
 						<td>@Model[i].CategoryName</td>
 						<td>
-							<a asp-action="ProductEdit" asp-route-id="@Model[i].Id">
+							<a asp-action="ProductEdit" asp-route-productId="@Model[i].Id">
 								<button class="btn btn-outline-warning btn-sm" style="display: inline-table">Edit</button>
 							</a>
-							<button asp-action="ProductDelete" class="btn btn-outline-danger btn-sm" style="display: inline-table" disabled>Delete</button>
+							<a asp-action="ProductDelete" asp-route-productId="@Model[i].Id" class="btn btn-outline-danger btn-sm" style="display: inline-table" disabled>
+								Delete
+							</a>
 						</td>
 					</tr>
 				}

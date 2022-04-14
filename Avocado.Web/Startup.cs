@@ -26,8 +26,9 @@ namespace Avocado.Web
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllersWithViews();
-			services.AddScoped<IBaseService, BaseService>();
+
 			services.AddHttpClient<IProductService, ProductService>();
+			services.AddScoped<IProductService, ProductService>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

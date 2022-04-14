@@ -5,7 +5,6 @@
 	<div class="col-md-4">
 		<form asp-action="ProductCreate" enctype="multipart/form-data">
 			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-			<input type="hidden" asp-for="@Model.Id" />
 			<div class="form-group">
 				<label asp-for="Name" class="control-label"></label>
 				<input asp-for="Name" class="form-control" />
@@ -33,17 +32,17 @@
 			</div>
 			<br />
 			<div class="form-group">
-				<input type="submit" value="Update" class="btn btn-warning" />
+				<input type="submit" value="Create" class="btn btn-warning" />
 				<a asp-action="Index" class="btn btn-success">Back to list</a>
 			</div>
 		</form>
 	</div>
-	<div class="col-md-4 py-3">
+	@*<div class="col-md-4 py-3">
 		@if (Model.ImageUrl != null)
 		{
 			<img src="~/images/@Model.ImageUrl" class="img-fluid img-thumbnail" />
 		}
-	</div>
+	</div>*@
 </div>
 
 @section Scripts {

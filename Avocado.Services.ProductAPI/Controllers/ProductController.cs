@@ -63,7 +63,7 @@ namespace Avocado.Services.ProductAPI.Controllers
 				//await _productRepo.Create(productDto);
 				await _spProductRepo.Create(productDto);
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				responseDto.IsSuccess = false;
 				responseDto.ErrorMessages = new List<string>() { e.ToString() };
@@ -78,7 +78,7 @@ namespace Avocado.Services.ProductAPI.Controllers
 				//await _productRepo.Update(productDto);
 				await _spProductRepo.Update(productDto);
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				responseDto.IsSuccess = false;
 				responseDto.ErrorMessages = new List<string>() { e.ToString() };
@@ -88,8 +88,8 @@ namespace Avocado.Services.ProductAPI.Controllers
 
 		[HttpDelete("{productId:int}")]
 		public async Task<object> Delete(int productId)
-		{	
-			if(!await _spProductRepo.Delete(productId))
+		{
+			if (!await _spProductRepo.Delete(productId))
 			//if (!await _productRepo.Delete(productId))
 			{
 				responseDto.IsSuccess = false;

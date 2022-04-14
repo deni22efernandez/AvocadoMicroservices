@@ -26,7 +26,7 @@ namespace Avocado.Web.Controllers
 			var result = await _productService.GetAllProductsAsync<ResponseDto>(null);
 			if (result!=null && result.IsSuccess)
 			{
-				productList=JsonConvert.DeserializeObject<List<ProductDto>>(Convert.ToString(result.ResponseObject));
+				productList=JsonConvert.DeserializeObject<List<ProductDto>>(JsonConvert.SerializeObject(result.ResponseObject));
 			}
 			return View(productList);
 		}

@@ -29,6 +29,24 @@ namespace Avocado.Web
 
 			services.AddHttpClient<IProductService, ProductService>();
 			services.AddScoped<IProductService, ProductService>();
+			services.AddAuthentication(x =>
+			{
+				x.DefaultAuthenticateScheme = "Cookies";
+				x.DefaultChallengeScheme = "oidc";
+			}).AddCookie("Cookies", x=> {
+				x.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+			}).AddOpenIdConnect("oidc", x=> {
+				x.Authority = "https://localhost:44388";
+				x.ClientId = "mango";
+				x.ClientSecret = "secret";
+				x.ResponseType = "code";
+				x.SaveTokens = true;
+				x.Scope.Add("mango");
+				x.TokenValidationParameters.RoleClaimType = "role";
+				x.TokenValidationParameters.NameClaimType = "name";
+				x.GetClaimsFromUserInfoEndpoint = true;
+			});
+			
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,7 +66,7 @@ namespace Avocado.Web
 			app.UseStaticFiles();
 
 			app.UseRouting();
-
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 			app.UseEndpoints(endpoints =>

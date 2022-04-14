@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,13 +38,57 @@ namespace Avocado.Services.ProductAPI
 			services.AddScoped<IProductRepository, Product_sp_Repository>();
 			//services.AddScoped<IProductRepository, Product_Repository>();
 			//services.AddScoped<IProductRepository, ProductRepository>();
-			services.AddSwaggerGen(x=> {
-				x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+			services.AddSwaggerGen(x =>
+			{
+				x.SwaggerDoc("v1", new OpenApiInfo
 				{
 					Title = "Avocado.Services.ProductAPI",
 					Version = "v1"
 				});
+				x.EnableAnnotations();
+				x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+				{
+					In = ParameterLocation.Header,
+					Name = "Authorization",
+					Type = SecuritySchemeType.ApiKey,
+					Description = "Enter Bearer [space] and your token",
+					Scheme = "Bearer"
+				});
+				x.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement {
+					{
+						new OpenApiSecurityScheme
+						{
+							 Reference=new OpenApiReference
+							 {
+								  Id="Bearer",
+								  Type= ReferenceType.SecurityScheme
+							 },
+							  In=ParameterLocation.Header,
+							   Scheme="OAUTH2",
+								Name="Bearer"
+						},
+						new List<string>()
+					}
+				});
 			});
+			services.AddAuthentication("Bearer")
+				.AddJwtBearer("Bearer", x =>
+			{
+				x.Authority = "https://localhost:44388/";
+				x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+				{
+					ValidateAudience = false
+				};
+			});
+			services.AddAuthorization(x =>
+			{
+				x.AddPolicy("ApiScope", policy =>
+				{
+					policy.RequireAuthenticatedUser();
+					policy.RequireClaim("scope","mango");
+				});
+			});
+
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,7 +107,7 @@ namespace Avocado.Services.ProductAPI
 			app.UseHttpsRedirection();
 
 			app.UseRouting();
-
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 			app.UseEndpoints(endpoints =>

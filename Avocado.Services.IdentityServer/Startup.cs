@@ -1,4 +1,5 @@
 using Avocado.Services.IdentityServer.DbContexts;
+using Avocado.Services.IdentityServer.Initializer;
 using Avocado.Services.IdentityServer.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -44,11 +45,12 @@ namespace Avocado.Services.IdentityServer
 			.AddInMemoryClients(Common.clients)
 			.AddDeveloperSigningCredential()
 			.AddAspNetIdentity<ApplicationUser>();
+			services.AddScoped<IDbInitializer, DbInitializer>();
 			
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDbInitializer _initializer)
 		{
 			if (env.IsDevelopment())
 			{
@@ -66,7 +68,7 @@ namespace Avocado.Services.IdentityServer
 			app.UseRouting();
 			app.UseIdentityServer();
 			app.UseAuthorization();
-
+			_initializer.Initialize();
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllerRoute(

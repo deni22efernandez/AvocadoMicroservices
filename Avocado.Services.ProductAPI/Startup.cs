@@ -1,4 +1,6 @@
+using Avocado.Services.ProductAPI.Dapper;
 using Avocado.Services.ProductAPI.DbContexts;
+using Avocado.Services.ProductAPI.Mapping;
 using Avocado.Services.ProductAPI.Repository;
 using Avocado.Services.ProductAPI.Repository.IRepository;
 using Microsoft.AspNetCore.Builder;
@@ -31,6 +33,8 @@ namespace Avocado.Services.ProductAPI
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddControllers();
+			services.AddTransient<IMapper, Mapper>();
+			services.AddScoped<IDapperWrapper, DapperWrapper>();
 			services.AddDbContext<ApplicationDbContext>(x =>
 			{
 				x.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));

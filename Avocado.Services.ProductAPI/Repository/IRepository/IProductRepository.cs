@@ -10,6 +10,7 @@ namespace Avocado.Services.ProductAPI.Repository.IRepository
 	{
 		Task<ProductDto> Get(int productId);
 		Task<IEnumerable<ProductDto>> Get();
+		Task<int> CreateAsync(ProductDto productDto);
 		Task<bool> Create(ProductDto productDto);
 		Task<bool> Update(ProductDto productDto);
 		Task<bool> Delete(int productId);

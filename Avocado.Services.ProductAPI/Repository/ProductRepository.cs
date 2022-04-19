@@ -1,4 +1,5 @@
 ﻿using Avocado.Services.ProductAPI.DbContexts;
+using Avocado.Services.ProductAPI.Mapping;
 using Avocado.Services.ProductAPI.Models;
 using Avocado.Services.ProductAPI.Models.Dtos;
 using Avocado.Services.ProductAPI.Repository.IRepository;
@@ -14,19 +15,29 @@ namespace Avocado.Services.ProductAPI.Repository
 	public class ProductRepository : IProductRepository
 	{
 		private readonly ApplicationDbContext _db;
-		public ProductRepository(ApplicationDbContext db)
+		private readonly IMapper _mapper;
+		public ProductRepository(ApplicationDbContext db, IMapper mapper)
 		{
 			_db = db;
+			_mapper = mapper;
 		}
 
 		public async Task<bool> Create(ProductDto productDto)
 		{
-			var product = JsonConvert.DeserializeObject<Product>(Convert.ToString(productDto));
+			var product = _mapper.Map<Product>(productDto);
 			await _db.Products.AddAsync(product);
 			if (await _db.SaveChangesAsync() > 0)
 				return true;
 			else
 				return false;
+		}
+
+		public async Task<int> CreateAsync(ProductDto productDto)
+		{
+			var product = _mapper.Map<Product>(productDto);
+			await _db.Products.AddAsync(product);
+			await _db.SaveChangesAsync();
+			return product.Id;
 		}
 
 		public async Task<bool> Delete(int productId)
@@ -46,7 +57,7 @@ namespace Avocado.Services.ProductAPI.Repository
 			var productFromDb = await _db.Products.FirstOrDefaultAsync(x => x.Id == productId);
 			if (productFromDb != null)
 			{
-				return JsonConvert.DeserializeObject<ProductDto>(Convert.ToString(productFromDb));
+				return _mapper.Map<ProductDto>(productFromDb);
 			}
 			return null;
 		}
@@ -56,7 +67,7 @@ namespace Avocado.Services.ProductAPI.Repository
 			var productsFromDb = await _db.Products.ToListAsync();
 			if (productsFromDb != null)
 			{
-				return JsonConvert.DeserializeObject<List<ProductDto>>(Convert.ToString(productsFromDb));
+				return _mapper.Map<List<ProductDto>>(productsFromDb);
 			}
 			return null;
 		}

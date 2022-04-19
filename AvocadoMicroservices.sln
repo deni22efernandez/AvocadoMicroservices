@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{E0
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avocado.Services.ProductAPI", "Avocado.Services.ProductAPI\Avocado.Services.ProductAPI.csproj", "{CEC22085-EF49-45CC-A530-4D570D837888}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avocado.Services.IdentityServer", "Avocado.Services.IdentityServer\Avocado.Services.IdentityServer.csproj", "{B46906D5-4EEF-4A9B-930E-FB6C849C5C8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avocado.Services.IdentityServer", "Avocado.Services.IdentityServer\Avocado.Services.IdentityServer.csproj", "{B46906D5-4EEF-4A9B-930E-FB6C849C5C8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

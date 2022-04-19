@@ -1,4 +1,6 @@
-﻿using Avocado.Services.ProductAPI.Models;
+﻿using Avocado.Services.ProductAPI.Dapper;
+using Avocado.Services.ProductAPI.Mapping;
+using Avocado.Services.ProductAPI.Models;
 using Avocado.Services.ProductAPI.Models.Dtos;
 using Avocado.Services.ProductAPI.Repository.IRepository;
 using Dapper;
@@ -7,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,22 +17,26 @@ namespace Avocado.Services.ProductAPI.Repository
 {
 	public class Product_sp_Repository : IProductRepository
 	{
-		protected string _connectionString;
-		public Product_sp_Repository(IConfiguration config)
+		public IDbConnection connection;
+		public IDapperWrapper _dapperWrapper;
+		private IMapper _mapper;
+		public Product_sp_Repository(IConfiguration config, IDapperWrapper dapperWrapper, IMapper mapper)
 		{
-			_connectionString = config.GetConnectionString("DefaultConnection");
+			_mapper = mapper;
+			_dapperWrapper = dapperWrapper;
+			this.connection = new SqlConnection(config.GetConnectionString("DefaultConnection"));
 		}
 		public async Task<bool> Create(ProductDto productDto)
 		{
-			await using var connection = new SqlConnection(_connectionString);
 			var parameters = new DynamicParameters();
-			parameters.Add("@productId", 0, System.Data.DbType.Int32, System.Data.ParameterDirection.Output);
+			parameters.Add("@productId", productDto.Id, direction: ParameterDirection.Output);
 			parameters.Add("@name", productDto.Name);
 			parameters.Add("@price", productDto.Price);
 			parameters.Add("@image", productDto.ImageUrl);
 			parameters.Add("@category", productDto.CategoryName);
 			parameters.Add("@description", productDto.Description);
-			await connection.ExecuteAsync("_spCreateProduct", parameters, commandType: System.Data.CommandType.StoredProcedure);
+			await _dapperWrapper.ExecuteAsync(connection, "_spCreateProduct", commandType: 2, parameters);
+			//await connection.ExecuteAsync("_spCreateProduct", parameters, commandType: System.Data.CommandType.StoredProcedure);
 			if (parameters.Get<int>("@productId") != 0)
 			{
 				return true;
@@ -37,40 +44,51 @@ namespace Avocado.Services.ProductAPI.Repository
 			return false;
 		}
 
+		public async Task<int> CreateAsync(ProductDto productDto)
+		{
+			var parameters = new DynamicParameters();
+			parameters.Add("@productId", productDto.Id, direction: ParameterDirection.Output);
+			parameters.Add("@name", productDto.Name);
+			parameters.Add("@price", productDto.Price);
+			parameters.Add("@image", productDto.ImageUrl);
+			parameters.Add("@category", productDto.CategoryName);
+			parameters.Add("@description", productDto.Description);
+			
+			await _dapperWrapper.ExecuteAsync(connection,"_spCreateProduct", commandType: 2, parameters);
+			var result = parameters.Get<int>("@productId");
+			return result;
+		}
+
 		public async Task<bool> Delete(int productId)
 		{
-			await using var connection = new SqlConnection(_connectionString);
 			var parameter = new DynamicParameters();
 			parameter.Add("@id", productId);
-			return await connection.ExecuteAsync("_spDeleteProduct", parameter, commandType: System.Data.CommandType.StoredProcedure)>0;		
+			return await _dapperWrapper.ExecuteAsync(connection, "_spDeleteProduct", commandType: 2, parameter)>0;		
 
 		}
 
 		public async Task<ProductDto> Get(int productId)
 		{
-			await using var connection = new SqlConnection(_connectionString);
 			var param = new DynamicParameters();
 			param.Add("@productId", productId);
-			var result = connection.QueryAsync<Product>("_spGetProductById", param, commandType: System.Data.CommandType.StoredProcedure).GetAwaiter().GetResult().Single();
-
-			return JsonConvert.DeserializeObject<ProductDto>(JsonConvert.SerializeObject(result));
+			var result = _dapperWrapper.Query<Product>(connection,"_spGetProductById", commdType: 2, param);
+			
+			return _mapper.Map<ProductDto>(result);
 
 		}
 
 		public async Task<IEnumerable<ProductDto>> Get()
 		{
-			await using var connection = new SqlConnection(_connectionString);
-			var result = await connection.QueryAsync<Product>("_spGetAllProducts", commandType: System.Data.CommandType.StoredProcedure);
+			var result = await _dapperWrapper.QueryAsync<Product>(connection, "_spGetAllProducts", commandType: 2);
 			if (result == null)
 			{
 				return null;
 			}
-			return JsonConvert.DeserializeObject<List<ProductDto>>(JsonConvert.SerializeObject(result));
+			return _mapper.Map<List<ProductDto>>(result);
 		}
 
 		public async Task<bool> Update(ProductDto productDto)
 		{
-			await using var connection = new SqlConnection(_connectionString);
 			var parameters = new DynamicParameters();
 			parameters.Add("@id", productDto.Id, System.Data.DbType.Int32);
 			parameters.Add("@name", productDto.Name);
@@ -83,11 +101,11 @@ namespace Avocado.Services.ProductAPI.Repository
 			parameters.Add("@description", productDto.Description);
 			if (productDto.ImageUrl != null)
 			{
-				return await connection.ExecuteAsync("_spUpdateProduct", parameters, commandType: System.Data.CommandType.StoredProcedure) > 0;
+				return await _dapperWrapper.ExecuteAsync(connection, "_spUpdateProduct", commandType: 2, parameters) > 0;
 			}
 			else
 			{
-				return await connection.ExecuteAsync("_spUpdateProductWithoutImage", parameters, commandType: System.Data.CommandType.StoredProcedure)> 0;
+				return await _dapperWrapper.ExecuteAsync(connection, "_spUpdateProductWithoutImage", commandType: 2, parameters)> 0;
 			}	
 
 		}

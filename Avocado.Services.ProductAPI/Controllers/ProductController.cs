@@ -61,7 +61,8 @@ namespace Avocado.Services.ProductAPI.Controllers
 			try
 			{
 				//await _productRepo.Create(productDto);
-				await _spProductRepo.Create(productDto);
+				//await _spProductRepo.Create(productDto);
+				await _spProductRepo.CreateAsync(productDto);//returns last id created
 			}
 			catch (Exception e)
 			{

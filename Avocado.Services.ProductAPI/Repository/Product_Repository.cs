@@ -1,4 +1,6 @@
-﻿using Avocado.Services.ProductAPI.Models;
+﻿using Avocado.Services.ProductAPI.Dapper;
+using Avocado.Services.ProductAPI.Mapping;
+using Avocado.Services.ProductAPI.Models;
 using Avocado.Services.ProductAPI.Models.Dtos;
 using Avocado.Services.ProductAPI.Repository.IRepository;
 using Dapper;
@@ -7,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,80 +17,80 @@ namespace Avocado.Services.ProductAPI.Repository
 {
 	public class Product_Repository : IProductRepository
 	{
-		private string _connectionString = "";
-		public Product_Repository(IConfiguration config)
+		public IDbConnection _connection;
+		private readonly IDapperWrapper _dapperWrapper;
+		private readonly IMapper _mapper;
+		public Product_Repository(IConfiguration config, IDapperWrapper dapperWrapper, IMapper mapper)
 		{
-			_connectionString = config.GetConnectionString("DefaultConnection");
+			this._connection = new SqlConnection(config.GetConnectionString("DefaultConnection"));
+			_dapperWrapper = dapperWrapper;
+			_mapper = mapper;
 		}
 
 		public async Task<bool> Create(ProductDto productDto)
 		{
-			await using var _connection = new SqlConnection(_connectionString);
-
 			string query = @"Insert into Products values (@name, @price, @image, @category, @description)";
-			return _connection.ExecuteAsync(query, new
+			return await _dapperWrapper.ExecuteAsync( _connection, query, commandType: 1, new
 			{
 				@name = productDto.Name,
 				@price = productDto.Price,
 				@image = productDto.ImageUrl,
 				@category = productDto.CategoryName,
 				@description = productDto.Description
-			}).GetAwaiter().GetResult() > 0;
+			}) > 0;
 
+		}
+
+		public async Task<int> CreateAsync(ProductDto productDto)
+		{
+			string query = @"Insert into Products values (@name, @price, @image, @category, @description);
+							Select Id=scope_identity()";
+			return await _dapperWrapper.ExecuteAsync(_connection, query, commandType: 1,
+				new {
+				@name = productDto.Name,
+				@price = productDto.Price,
+				@image = productDto.ImageUrl,
+				@category = productDto.CategoryName,
+				@description = productDto.Description
+			});
 		}
 
 		public async Task<bool> Delete(int productId)
 		{
-			await using var _connection = new SqlConnection(_connectionString);
 			string query = "Delete from Products where Id = @productId";
-			var result= _connection.ExecuteAsync(query, new { @productId = productId }).GetAwaiter().GetResult() > 0;
-			return result;
+			return await _dapperWrapper.ExecuteAsync(_connection, query, commandType: 1, new { @productId = productId }) > 0;		
 		}
 
 		public async Task<ProductDto> Get(int productId)
 		{
-			await using var _connection = new SqlConnection(_connectionString);
 			string query = "Select * from Products where Id = @productId";
-			var result = _connection.QueryAsync<Product>(query, new { @productId = productId }).GetAwaiter().GetResult().Single();
+			var result = _dapperWrapper.QueryAsync<Product>(_connection, query, commandType:1, new { @productId = productId }).GetAwaiter().GetResult().Single();
 
-			ProductDto dto = JsonConvert.DeserializeObject<ProductDto>(JsonConvert.SerializeObject(result));
-			//var json = JsonConvert.SerializeObject(result);
-			//ProductDto dto = JsonConvert.DeserializeObject<ProductDto>(json);
-			//ProductDto dto = new ProductDto()
-			//{
-			//	Id = result.Id,
-			//	Name = result.Name,
-			//	CategoryName = result.CategoryName,
-			//	Description = result.Description,
-			//	ImageUrl = result.ImageUrl,
-			//	Price = result.Price
-			//};
+			ProductDto dto = _mapper.Map<ProductDto>(result);
 			return dto;
 
 		}
 
 		public async Task<IEnumerable<ProductDto>> Get()
 		{
-			await using var _connection = new SqlConnection(_connectionString);
 			string query = "Select * from Products";
-			var result = await _connection.QueryAsync<Product>(query);			
+			var result = await _dapperWrapper.QueryAsync<Product>(_connection, query, commandType:1);			
 			List<ProductDto> productDtos = new List<ProductDto>();
 			foreach (var item in result)
 			{
-				productDtos.Add(JsonConvert.DeserializeObject<ProductDto>(JsonConvert.SerializeObject(item)));
+				productDtos.Add(_mapper.Map<ProductDto>(item));
 			}
 			return productDtos;
 		}
 
 		public async Task<bool> Update(ProductDto productDto)
 		{
-			await using var _connection = new SqlConnection(_connectionString);
 			if (productDto.ImageUrl == null)
 			{
 				string query2 = @"Update Products
 							set Name=@name, Price=@price, CategoryName=@category, Description=@description
 							where Id=@productId";
-				return await _connection.ExecuteAsync(query2, new
+				return await _dapperWrapper.ExecuteAsync(_connection, query2, commandType: 1, new
 				{
 					@name = productDto.Name,
 					@price = productDto.Price,
@@ -101,7 +104,7 @@ namespace Avocado.Services.ProductAPI.Repository
 				string query1 = @"Update Products
 							set Name=@name, Price=@price, ImageUrl=@image, CategoryName=@category, Description=@description
 							where Id=@productId";
-				return await _connection.ExecuteAsync(query1, new
+				return await _dapperWrapper.ExecuteAsync(_connection, query1, commandType: 1, new
 				{
 					@name = productDto.Name,
 					@price = productDto.Price,

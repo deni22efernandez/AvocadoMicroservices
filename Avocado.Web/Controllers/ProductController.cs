@@ -1,5 +1,6 @@
 ﻿using Avocado.Web.Models;
 using Avocado.Web.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -20,6 +21,7 @@ namespace Avocado.Web.Controllers
 			_productService = productService;
 			_hostEnvironment = hostEnvironment;
 		}
+		[Authorize]
 		public async Task<IActionResult> ProductIndex()
 		{
 			List<ProductDto> products = new List<ProductDto>();

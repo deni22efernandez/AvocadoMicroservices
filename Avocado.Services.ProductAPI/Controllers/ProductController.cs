@@ -1,5 +1,6 @@
 ﻿using Avocado.Services.ProductAPI.Models.Dtos;
 using Avocado.Services.ProductAPI.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -40,6 +41,7 @@ namespace Avocado.Services.ProductAPI.Controllers
 			return responseDto;
 		}
 		[HttpGet]
+		[Authorize]
 		public async Task<object> Get()
 		{
 			try
